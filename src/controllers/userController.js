@@ -11,6 +11,7 @@ const {
   httpStatus,
   MIN_PASSWORD_LENGTH,
   ROLES,
+  ADMIN,
 } = require('../config/constants');
 
 const {
@@ -24,11 +25,23 @@ const userRoutes = Router();
 userRoutes.post(
   '/',
   validateToken,
-  body('name').isLength({ max: 30 }).isString(),
+  body('name').isString(),
   body('role').isIn(ROLES),
   body('email').isEmail(),
   body('password').isLength({ min: MIN_PASSWORD_LENGTH }),
   async (req, res) => {
+    if (req.authorized === false) {
+      return res
+        .status(req.customError.status)
+        .json(req.customError.body);
+    }
+
+    if (req.user.role !== ADMIN) {
+      return res.status(httpStatus.Forbidden).json({
+        message: 'Only Administrators can create users',
+      });
+    }
+
     const validationErrors = validationResult(req);
 
     if (!validationErrors.isEmpty()) {
