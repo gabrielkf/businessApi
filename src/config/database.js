@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const { CONNECTION_STRING } = require('./constants');
 
-mongoose.connect(CONNECTION_STRING);
+mongoose.connect(process.env.CONNECTION_STRING);
 
 const db = mongoose.connection;
 db.on('error', () => {

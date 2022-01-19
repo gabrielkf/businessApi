@@ -1,2 +1,4 @@
 node_modules
 prettier*
+docker-compose.debug.yml
+.env

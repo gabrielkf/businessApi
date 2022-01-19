@@ -19,7 +19,10 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
-    trim: true,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
   },
 });
 

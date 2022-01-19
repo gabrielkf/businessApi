@@ -3,8 +3,9 @@ const {
   MIN_PASSWORD_LENGTH,
   ROLES,
 } = require('../config/constants');
+const { customError } = require('../utils/customError');
 
-module.exports.validationErrorCreation = (
+module.exports.validationErrorOnCreation = (
   validationErrors,
   body
 ) => {
@@ -14,7 +15,7 @@ module.exports.validationErrorCreation = (
 
   if (missingParams.includes('role') && !!body.role) {
     return customError(
-      httpStatus.BadRequest,
+      httpStatus.NotAcceptable,
       `Role must be either ${ROLES.join(' or ')}`
     );
   }
@@ -24,7 +25,7 @@ module.exports.validationErrorCreation = (
     !!body.password
   ) {
     return customError(
-      httpStatus.BadRequest,
+      httpStatus.NotAcceptable,
       `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`
     );
   }
@@ -36,10 +37,3 @@ module.exports.validationErrorCreation = (
     )}`
   );
 };
-
-function customError(status, message) {
-  return {
-    status,
-    body: { message },
-  };
-}
