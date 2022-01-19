@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const {
   httpStatus,
   MIN_PASSWORD_LENGTH,
@@ -37,3 +38,6 @@ module.exports.validationErrorOnCreation = (
     )}`
   );
 };
+
+module.exports.encryptPassword = async password =>
+  await bcrypt.hash(password, 10);

@@ -1,5 +1,4 @@
 const { Router } = require('express');
-const bcrypt = require('bcrypt');
 const userRepository = require('../repositories/userRepository');
 const validateToken = require('../middlewares/validateToken');
 
@@ -16,6 +15,7 @@ const {
 
 const {
   validationErrorOnCreation,
+  encryptPassword,
 } = require('../services/userServices');
 
 const userRoutes = Router();
@@ -54,7 +54,7 @@ userRoutes.post(
       });
     }
 
-    const hash = await bcrypt.hash(password, 10);
+    const hash = await encryptPassword(password);
 
     const user = new userRepository({
       name,

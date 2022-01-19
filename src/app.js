@@ -5,6 +5,7 @@ const routes = require('./controllers');
 const { PORT } = require('./config/constants');
 
 require('./config/database');
+require('./config/rootUser');
 
 const server = express();
 server
