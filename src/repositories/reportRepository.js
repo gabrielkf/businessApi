@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const reportSchema = new Schema({
+  createdBy: String,
   country: String,
   companies: [
     {
