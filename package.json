@@ -8,7 +8,6 @@
     "start": "node src/app.js"
   },
   "dependencies": {
-    "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
     "dotenv": "^14.2.0",

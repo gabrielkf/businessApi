@@ -19,4 +19,9 @@ module.exports.ROLES = ['Admin', 'Operator'];
 
 module.exports.ADMIN = 'Admin';
 
+module.exports.OPERATOR = 'Operator';
+
 module.exports.TOKEN_EXPIRATION = '4h';
+
+module.exports.API_URL =
+  'https://fakerapi.it/api/v1/companies?_locale=pt_BR&_quantity=1000';
