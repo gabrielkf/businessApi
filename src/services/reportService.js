@@ -1,3 +1,6 @@
+const superagent = require('superagent');
+const { API_URL } = require('../config/constants');
+
 function removeSpecialChars(text) {
   return text
     .replace('á', 'a')
@@ -15,9 +18,22 @@ function removeSpecialChars(text) {
     .replace('ç', 'c');
 }
 
-module.exports.compareCountries = (text1, text2) => {
+function compareCountries(text1, text2) {
   return (
     removeSpecialChars(text1.toLowerCase()) ===
     removeSpecialChars(text2.toLowerCase())
   );
-};
+}
+
+async function getCompaniesByCountry(country) {
+  const { text } = await superagent.get(API_URL);
+  const { data: companies } = JSON.parse(text);
+
+  const filteredCompanies = companies.filter(c => {
+    return compareCountries(c.country, country);
+  });
+
+  return filteredCompanies;
+}
+
+module.exports = { getCompaniesByCountry };

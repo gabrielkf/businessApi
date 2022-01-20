@@ -30,6 +30,7 @@ userRoutes.post(
   body('email').isEmail(),
   body('password').isLength({ min: MIN_PASSWORD_LENGTH }),
   async (req, res) => {
+    // * CHECK AUTHORIZATION
     if (req.authorized === false) {
       return res
         .status(req.customError.status)
@@ -38,10 +39,12 @@ userRoutes.post(
 
     if (req.user.role !== ADMIN) {
       return res.status(httpStatus.Forbidden).json({
-        message: 'Only Administrators can create users',
+        message:
+          'Only Administrators are allowed to create users',
       });
     }
 
+    // * CHECK REQUIRED FIELDS
     const validationErrors = validationResult(req);
 
     if (!validationErrors.isEmpty()) {
@@ -55,6 +58,7 @@ userRoutes.post(
         .json(customError.body);
     }
 
+    // * INSERT TO DB
     const { name, role, email, password } = req.body;
 
     const existingUser = await userRepository
@@ -79,14 +83,12 @@ userRoutes.post(
 
     try {
       await user.save();
-      res.status(httpStatus.Created).json(user);
+      return res.status(httpStatus.Created).json(user);
     } catch (e) {
       return res
         .status(httpStatus.InternalServerError)
         .json({ message: 'Database failed' });
     }
-
-    return res.status(httpStatus.Created).send();
   }
 );
 

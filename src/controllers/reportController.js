@@ -1,4 +1,4 @@
-const https = require('https');
+const agent = require('superagent');
 const { Router } = require('express');
 const {
   body,
@@ -8,12 +8,13 @@ const {
   httpStatus,
   API_URL,
   OPERATOR,
+  MIN_COMPANIES,
 } = require('../config/constants');
 const validateToken = require('../middlewares/validateToken');
 const {
-  compareCountries,
+  getCompaniesByCountry,
 } = require('../services/reportService');
-const { compare } = require('bcrypt');
+const reportRepository = require('../repositories/reportRepository');
 
 const reportRoutes = Router();
 
@@ -22,7 +23,7 @@ reportRoutes.post(
   '/',
   validateToken,
   body('country').isString(),
-  (req, res) => {
+  async (req, res) => {
     // * CHECK AUTHORIZATION
     if (req.authorized === false) {
       return res
@@ -32,7 +33,8 @@ reportRoutes.post(
 
     if (req.user.role !== OPERATOR) {
       return res.status(httpStatus.Forbidden).json({
-        message: 'Only Operators can generate reports',
+        message:
+          'Only Operators are allowed to generate reports',
       });
     }
 
@@ -45,36 +47,72 @@ reportRoutes.post(
       });
     }
 
+    // * FETCH COMPANIES
     const { country } = req.body;
+    const companies = await getCompaniesByCountry(country);
 
-    https
-      .get(API_URL, apiResponse => {
-        const buffer = [];
-
-        apiResponse.on('data', chunk => {
-          buffer.push(chunk);
-        });
-
-        apiResponse.on('end', () => {
-          const companies = JSON.parse(
-            Buffer.concat(buffer).toString()
-          );
-
-          const filteredCompanies = companies.data.filter(
-            c => {
-              return compareCountries(c.country, country);
-            }
-          );
-
-          return res.json(filteredCompanies);
-        });
-      })
-      .on('error', err => {
-        return res
-          .status(httpStatus.InternalServerError)
-          .json({ message: err.message });
+    // * INSERT TO DB
+    if (companies.length < MIN_COMPANIES) {
+      return res.json({
+        message:
+          filteredCompanies.length === 0
+            ? `No companies from ${country} were found`
+            : `Insufficient companies from ${country} to build a report`,
       });
+    }
+
+    try {
+      const report = new reportRepository({
+        country,
+        companies: companies,
+        createdAt: new Date(),
+      });
+
+      report
+        .save()
+        .then(() => {
+          return res
+            .status(httpStatus.Created)
+            .json(report);
+        })
+        .catch(e => {
+          return res
+            .status(httpStatus.InternalServerError)
+            .json({ message: e.message });
+        });
+    } catch (e) {
+      return res
+        .status(httpStatus.InternalServerError)
+        .json({ message: e.message });
+    }
   }
 );
+
+// * READ
+reportRoutes.get('/', async (req, res) => {
+  const reports = await reportRepository.find({});
+
+  if (!reports) {
+    return res
+      .status(httpStatus.NotFound)
+      .json({ message: 'No reports found' });
+  }
+
+  return res.json(reports);
+});
+
+// * DELETE
+reportRoutes.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await reportRepository.findByIdAndDelete(id);
+    return res.status(httpStatus.NoContent).send();
+  } catch (e) {
+    return res
+      .status(httpStatus.InternalServerError)
+      .json({ message: 'Error while deleting report' });
+  }
+});
 
 module.exports = reportRoutes;

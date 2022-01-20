@@ -15,7 +15,8 @@
     "express-validator": "^6.14.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.7",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "superagent": "^7.1.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.2"
