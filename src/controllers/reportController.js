@@ -1,12 +1,12 @@
-const agent = require('superagent');
 const { Router } = require('express');
+const fs = require('fs');
+const { resolve } = require('path');
 const {
   body,
   validationResult,
 } = require('express-validator');
 const {
   httpStatus,
-  API_URL,
   OPERATOR,
   MIN_COMPANIES,
 } = require('../config/constants');

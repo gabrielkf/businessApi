@@ -1,6 +1,6 @@
-module.exports.PORT = 3030;
+exports.PORT = 3030;
 
-module.exports.httpStatus = {
+exports.httpStatus = {
   Ok: 200,
   Created: 201,
   NoContent: 204,
@@ -13,17 +13,17 @@ module.exports.httpStatus = {
   InternalServerError: 500,
 };
 
-module.exports.MIN_PASSWORD_LENGTH = 6;
+exports.MIN_PASSWORD_LENGTH = 6;
 
-module.exports.TOKEN_EXPIRATION = '4h';
+exports.TOKEN_EXPIRATION = '4h';
 
-module.exports.API_URL =
-  'https://fakerapi.it/api/v1/companies?_locale=pt_BR&_quantity=1000';
+exports.API_URL =
+  'https://fakerapi.it/api/v1/companies?_locale=pt_BR&_quantity=500';
 
-module.exports.MIN_COMPANIES = 2;
+exports.MIN_COMPANIES = 2;
 
 const admin = 'Admin';
 const op = 'Operator';
-module.exports.ROLES = [admin, op];
-module.exports.ADMIN = admin;
-module.exports.OPERATOR = op;
+exports.ROLES = [admin, op];
+exports.ADMIN = admin;
+exports.OPERATOR = op;

@@ -1,8 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {
-  httpStatus,
-  ADMIN,
-} = require('../config/constants');
+const { httpStatus } = require('../config/constants');
 const { customError } = require('../utils/customError');
 
 module.exports = function validateToken(req, res, next) {
