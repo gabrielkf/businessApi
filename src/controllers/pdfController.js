@@ -9,44 +9,62 @@ const {
   OPERATOR,
   TEMPORARY,
 } = require('../config/constants');
-const { reset } = require('nodemon');
 
 const pdfRoutes = Router();
 
-pdfRoutes.get('/', async (req, res) => {
-  const filePath = TEMPORARY + '/notaMemoriaKabum.pdf';
-  const file = fs.createReadStream(filePath);
-  const stat = fs.statSync(filePath);
+pdfRoutes.get('/:id', validateToken, async (req, res) => {
+  if (!req.params.id) {
+    return res
+      .status(httpStatus.BadRequest)
+      .json({ message: 'Missing parameter in route: id' });
+  }
 
-  res
-    .setHeader('Content-Length', stat.size)
-    .setHeader('Content-Type', 'application/pdf')
-    .setHeader(
-      'Content-Disposition',
-      'attachment; filename=report.pdf'
-    );
+  if (req.authorized === false) {
+    return res
+      .status(req.customError.status)
+      .json(req.customError.body);
+  }
 
-  file.pipe(res);
-});
-
-pdfRoutes.get('/:id', async (req, res) => {
   const report = await reportRepository.findById(
     req.params.id
   );
 
-  const filePath = generatePdf(report);
-  const file = fs.createReadStream(filePath);
-  const stat = fs.statSync(filePath);
+  if (!report) {
+    return res
+      .status(httpStatus.NotFound)
+      .json({ message: 'No report found for id given' });
+  }
 
-  res
-    .setHeader('Content-Length', stat.size)
-    .setHeader('Content-Type', 'application/pdf')
-    .setHeader(
-      'Content-Disposition',
-      'attachment; filename=report.pdf'
-    );
+  if (
+    req.user.role === OPERATOR &&
+    req.user.email !== report.createdBy
+  ) {
+    return res.status(httpStatus.Unauthorized).json({
+      message:
+        'Operators can only access their own reports',
+    });
+  }
 
-  file.pipe(res);
+  try {
+    const filePath = await generatePdf(report);
+
+    const file = fs.createReadStream(filePath);
+    const stat = fs.statSync(filePath);
+
+    res
+      .setHeader('Content-Length', stat.size)
+      .setHeader('Content-Type', 'application/pdf')
+      .setHeader(
+        'Content-Disposition',
+        'attachment; filename=report.pdf'
+      );
+
+    file.pipe(res);
+  } catch (e) {
+    return res
+      .status(httpStatus.InternalServerError)
+      .json({ message: e.message });
+  }
 });
 
 module.exports = pdfRoutes;

@@ -48,7 +48,7 @@ module.exports = function validateToken(req, res, next) {
     req.authorized = false;
     req.customError = customError(
       httpStatus.InternalServerError,
-      'Error while parsing token'
+      'Token is invalid or has expired'
     );
   }
 
