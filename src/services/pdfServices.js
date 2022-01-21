@@ -31,6 +31,13 @@ function generatePdf({ _id, companies }) {
   const doc = new PDFDocument();
   doc.pipe(fs.createWriteStream(`${TEMPORARY}/guid.pdf`));
 
+  doc.image(
+    `${TEMPORARY}/sampleImage.png`,
+    BAR_X,
+    HEADER_Y - OFFSET,
+    { scale: 0.25 }
+  );
+
   doc
     .fillColor(TEXT_COLOR)
     .font(`${FONTS}/${FONT.BOLD}`)
