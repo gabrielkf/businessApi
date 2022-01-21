@@ -9,6 +9,7 @@ const {
   OPERATOR,
   TEMPORARY,
 } = require('../config/constants');
+const { reset } = require('nodemon');
 
 const pdfRoutes = Router();
 
@@ -32,8 +33,20 @@ pdfRoutes.get('/:id', async (req, res) => {
   const report = await reportRepository.findById(
     req.params.id
   );
-  // generatePdf(report);
-  return res.json(report);
+
+  const filePath = generatePdf(report);
+  const file = fs.createReadStream(filePath);
+  const stat = fs.statSync(filePath);
+
+  res
+    .setHeader('Content-Length', stat.size)
+    .setHeader('Content-Type', 'application/pdf')
+    .setHeader(
+      'Content-Disposition',
+      'attachment; filename=report.pdf'
+    );
+
+  file.pipe(res);
 });
 
 module.exports = pdfRoutes;
