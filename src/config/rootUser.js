@@ -19,6 +19,7 @@ const { ADMIN } = require('./constants');
       role: ADMIN,
       email: process.env.ROOT_EMAIL,
       password: hash,
+      confirmed: true,
       createdAt: new Date(),
     });
 

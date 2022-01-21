@@ -12,11 +12,13 @@ const {
   MIN_PASSWORD_LENGTH,
   ROLES,
   ADMIN,
+  ACTIVATION_LIMIT_MINUTES,
 } = require('../config/constants');
 
 const {
   validationErrorOnCreation,
   encryptPassword,
+  sendActivationEmail,
 } = require('../services/userServices');
 
 const userRoutes = Router();
@@ -30,7 +32,6 @@ userRoutes.post(
   body('email').isEmail(),
   body('password').isLength({ min: MIN_PASSWORD_LENGTH }),
   async (req, res) => {
-    // * CHECK AUTHORIZATION
     if (req.authorized === false) {
       return res
         .status(req.customError.status)
@@ -44,7 +45,6 @@ userRoutes.post(
       });
     }
 
-    // * CHECK REQUIRED FIELDS
     const validationErrors = validationResult(req);
 
     if (!validationErrors.isEmpty()) {
@@ -58,7 +58,6 @@ userRoutes.post(
         .json(customError.body);
     }
 
-    // * INSERT TO DB
     const { name, role, email, password } = req.body;
 
     const existingUser = await userRepository
@@ -83,11 +82,17 @@ userRoutes.post(
 
     try {
       await user.save();
+
+      await sendActivationEmail(
+        user,
+        `users/confirm/${user._id}`
+      );
+
       return res.status(httpStatus.Created).json(user);
     } catch (e) {
       return res
         .status(httpStatus.InternalServerError)
-        .json({ message: 'Database failed' });
+        .json({ message: 'Error while creating user' });
     }
   }
 );
@@ -120,9 +125,65 @@ userRoutes.delete('/:id', async (req, res) => {
     await userRepository.findByIdAndDelete(id);
     return res.status(httpStatus.NoContent).send();
   } catch (e) {
+    console.log(e.message);
     return res
       .status(httpStatus.InternalServerError)
       .json({ message: 'Failed to delete user' });
+  }
+});
+
+userRoutes.get('/email', async (req, res) => {
+  try {
+    const user = await userRepository
+      .findOne({
+        email: 'gabrielkf@gmail.com',
+      })
+      .exec();
+
+    await sendActivationEmail(
+      user,
+      `users/confirm/${user._id}`
+    );
+
+    return res.status(httpStatus.NoContent).send();
+  } catch (e) {
+    return res
+      .status(httpStatus.InternalServerError)
+      .json({ message: e.message });
+  }
+});
+
+userRoutes.get('/confirm/:id', async (req, res) => {
+  const { id } = req.params;
+  const user = await userRepository.findById(id).exec();
+
+  if (!user) {
+    return res
+      .status(httpStatus.NotFound)
+      .send(`No user with id ${id}`);
+  }
+
+  const timeCreatedMinutes =
+    (new Date().getTime() -
+      new Date(user.createdAt).getTime()) /
+    (1000 * 60);
+
+  if (timeCreatedMinutes > ACTIVATION_LIMIT_MINUTES) {
+    return res
+      .status(httpStatus.Forbidden)
+      .send('Confirmation email has expired');
+  }
+
+  try {
+    await userRepository.findByIdAndUpdate(id, {
+      confirmed: true,
+    });
+
+    return res.send('Sua conta foi confirmada');
+  } catch (e) {
+    return res
+      .status(httpStatus.InternalServerError)
+      .send('Failed to confirm account');
   }
 });
 

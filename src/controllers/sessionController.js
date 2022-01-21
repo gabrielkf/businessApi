@@ -47,6 +47,12 @@ sessionRoutes.post(
         .json({ message: 'Email not found' });
     }
 
+    if (existingUser.confirmed === false) {
+      return res
+        .status(httpStatus.Forbidden)
+        .json({ message: 'Account is not confirmed' });
+    }
+
     try {
       const passwordMatches = await bcrypt.compare(
         password,

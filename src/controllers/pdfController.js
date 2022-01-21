@@ -58,7 +58,7 @@ pdfRoutes.get('/:id', validateToken, async (req, res) => {
       .setHeader('Content-Type', 'application/pdf')
       .setHeader(
         'Content-Disposition',
-        'attachment; filename=report.pdf'
+        `attachment; filename=Report.pdf`
       );
 
     file.pipe(res);

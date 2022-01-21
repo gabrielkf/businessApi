@@ -1,5 +1,6 @@
 const { resolve } = require('path');
 
+exports.HOST = 'http://localhost';
 exports.PORT = 3030;
 
 exports.httpStatus = {
@@ -37,3 +38,8 @@ exports.FONT = {
   REGULAR: 'Roboto-Regular.ttf',
   BOLD: 'Roboto-Bold.ttf',
 };
+
+exports.SMTP_SERVER = 'smtp.gmail.com';
+exports.SMTP_PORT = 587;
+
+exports.ACTIVATION_LIMIT_MINUTES = 30;
