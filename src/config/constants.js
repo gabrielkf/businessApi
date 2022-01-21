@@ -1,3 +1,5 @@
+const { resolve } = require('path');
+
 exports.PORT = 3030;
 
 exports.httpStatus = {
@@ -27,3 +29,11 @@ const op = 'Operator';
 exports.ROLES = [admin, op];
 exports.ADMIN = admin;
 exports.OPERATOR = op;
+
+exports.TEMPORARY = resolve(__dirname, '..', '..', 'tmp');
+exports.FONTS = resolve(__dirname, '..', '..', 'fonts');
+
+exports.FONT = {
+  REGULAR: 'Roboto-Regular.ttf',
+  BOLD: 'Roboto-Bold.ttf',
+};

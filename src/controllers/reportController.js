@@ -14,7 +14,7 @@ const validateToken = require('../middlewares/validateToken');
 const {
   removeSpecialCharsLower,
   getCompaniesByCountry,
-} = require('../services/reportService');
+} = require('../services/reportServices');
 const reportRepository = require('../repositories/reportRepository');
 
 const reportRoutes = Router();

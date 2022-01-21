@@ -1,25 +1,19 @@
 const { Router } = require('express');
 const fs = require('fs');
-const { resolve } = require('path');
 
+const { generatePdf } = require('../services/pdfServices');
 const validateToken = require('../middlewares/validateToken');
 const reportRepository = require('../repositories/reportRepository');
 const {
   httpStatus,
   OPERATOR,
+  TEMPORARY,
 } = require('../config/constants');
 
 const pdfRoutes = Router();
 
 pdfRoutes.get('/', async (req, res) => {
-  const filePath = resolve(
-    __dirname,
-    '..',
-    '..',
-    'tmp',
-    'notaMemoriaKabum.pdf'
-  );
-
+  const filePath = TEMPORARY + '/notaMemoriaKabum.pdf';
   const file = fs.createReadStream(filePath);
   const stat = fs.statSync(filePath);
 
@@ -32,6 +26,14 @@ pdfRoutes.get('/', async (req, res) => {
     );
 
   file.pipe(res);
+});
+
+pdfRoutes.get('/:id', async (req, res) => {
+  const report = await reportRepository.findById(
+    req.params.id
+  );
+  // generatePdf(report);
+  return res.json(report);
 });
 
 module.exports = pdfRoutes;
