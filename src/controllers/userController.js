@@ -97,62 +97,7 @@ userRoutes.post(
   }
 );
 
-// * READ
-userRoutes.get('/', async (req, res) => {
-  try {
-    const users = await userRepository.find({});
-
-    if (users == null) {
-      return res
-        .status(httpStatus.NotFound)
-        .json({ message: 'No users found' });
-    }
-
-    return res.json(users);
-  } catch (e) {
-    console.error(e);
-    return res
-      .status(httpStatus.InternalServerError)
-      .json({ message: 'Database failed' });
-  }
-});
-
-// * DELETE
-userRoutes.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    await userRepository.findByIdAndDelete(id);
-    return res.status(httpStatus.NoContent).send();
-  } catch (e) {
-    console.log(e.message);
-    return res
-      .status(httpStatus.InternalServerError)
-      .json({ message: 'Failed to delete user' });
-  }
-});
-
-userRoutes.get('/email', async (req, res) => {
-  try {
-    const user = await userRepository
-      .findOne({
-        email: 'gabrielkf@gmail.com',
-      })
-      .exec();
-
-    await sendActivationEmail(
-      user,
-      `users/confirm/${user._id}`
-    );
-
-    return res.status(httpStatus.NoContent).send();
-  } catch (e) {
-    return res
-      .status(httpStatus.InternalServerError)
-      .json({ message: e.message });
-  }
-});
-
+// * ACCOUNT CONFIRMATION
 userRoutes.get('/confirm/:id', async (req, res) => {
   const { id } = req.params;
   const user = await userRepository.findById(id).exec();

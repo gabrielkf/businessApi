@@ -20,8 +20,9 @@ exports.MIN_PASSWORD_LENGTH = 6;
 
 exports.TOKEN_EXPIRATION = '4h';
 
-exports.API_URL =
-  'https://fakerapi.it/api/v1/companies?_locale=pt_BR&_quantity=500';
+const LOCALE = 'pt_BR';
+const QUANTITY = 500;
+exports.API_URL = `https://fakerapi.it/api/v1/companies?_locale=${LOCALE}&_quantity=${QUANTITY}`;
 
 exports.MIN_COMPANIES = 2;
 

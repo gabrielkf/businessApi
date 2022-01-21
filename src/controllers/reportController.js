@@ -125,31 +125,4 @@ reportRoutes.get('/', validateToken, async (req, res) => {
   return res.json(reports);
 });
 
-// * READ ALL
-reportRoutes.get('/all', async (req, res) => {
-  const reports = await reportRepository.find();
-
-  if (!reports) {
-    return res
-      .status(httpStatus.NotFound)
-      .json({ message: 'No reports found' });
-  }
-
-  return res.json(reports);
-});
-
-// * DELETE
-reportRoutes.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    await reportRepository.findByIdAndDelete(id);
-    return res.status(httpStatus.NoContent).send();
-  } catch (e) {
-    return res
-      .status(httpStatus.InternalServerError)
-      .json({ message: 'Error while deleting report' });
-  }
-});
-
 module.exports = reportRoutes;
