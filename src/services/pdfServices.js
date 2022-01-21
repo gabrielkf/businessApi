@@ -9,7 +9,6 @@ const {
 } = require('../config/constants');
 
 const LEFT_MARGIN = 100;
-
 const TEXT_COLOR = '#303030';
 const OFFSET = 10;
 
@@ -96,6 +95,7 @@ exports.generatePdf = async ({ _id, companies }) => {
 
 async function waitForFileExists(
   filePath,
+  interval = 100,
   currentTime = 0,
   timeout = 5000
 ) {
@@ -103,12 +103,22 @@ async function waitForFileExists(
   if (currentTime === timeout) return false;
 
   await new Promise((resolve, reject) =>
-    setTimeout(() => resolve(true), 100)
+    setTimeout(() => resolve(true), interval)
   );
 
   return waitForFileExists(
     filePath,
-    currentTime + 1000,
+    currentTime + interval,
     timeout
   );
 }
+
+exports.deleteReportAfterSent = (
+  filePath,
+  delayMinutes = 1
+) => {
+  return setTimeout(
+    () => fs.unlinkSync(filePath),
+    delayMinutes * 1000 * 60
+  );
+};
