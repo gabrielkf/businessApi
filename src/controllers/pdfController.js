@@ -1,7 +1,10 @@
 const { Router } = require('express');
 const fs = require('fs');
 
-const { generatePdf } = require('../services/pdfServices');
+const {
+  generatePdf,
+  deleteReportAfterSent,
+} = require('../services/pdfServices');
 const validateToken = require('../middlewares/validateToken');
 const reportRepository = require('../repositories/reportRepository');
 const {
@@ -47,7 +50,6 @@ pdfRoutes.get('/:id', validateToken, async (req, res) => {
 
   try {
     const filePath = await generatePdf(report);
-
     const file = fs.createReadStream(filePath);
     const stat = fs.statSync(filePath);
 
@@ -60,6 +62,7 @@ pdfRoutes.get('/:id', validateToken, async (req, res) => {
       );
 
     file.pipe(res);
+    deleteReportAfterSent(filePath);
   } catch (e) {
     return res
       .status(httpStatus.InternalServerError)

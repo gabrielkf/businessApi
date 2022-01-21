@@ -9,12 +9,11 @@ const {
 } = require('../config/constants');
 
 const LEFT_MARGIN = 100;
-
 const TEXT_COLOR = '#303030';
 const OFFSET = 10;
 
-const FONT_TITLE = 25;
-const FONT_BIG = 21;
+const FONT_TITLE = 28;
+const FONT_BIG = 22;
 const FONT_REGULAR = 16;
 const HEADER_Y = 100;
 const LINE = 25;
@@ -29,6 +28,7 @@ const CONTACT_TITLE =
   'Informações do Contato'.toUpperCase();
 
 exports.generatePdf = async ({ _id, companies }) => {
+  console.log(companies);
   let page = 1;
 
   const filePath = `${TEMPORARY}/${_id}.pdf`;
@@ -96,6 +96,7 @@ exports.generatePdf = async ({ _id, companies }) => {
 
 async function waitForFileExists(
   filePath,
+  interval = 100,
   currentTime = 0,
   timeout = 5000
 ) {
@@ -103,12 +104,23 @@ async function waitForFileExists(
   if (currentTime === timeout) return false;
 
   await new Promise((resolve, reject) =>
-    setTimeout(() => resolve(true), 100)
+    setTimeout(() => resolve(true), interval)
   );
 
   return waitForFileExists(
     filePath,
-    currentTime + 1000,
+    currentTime + interval,
     timeout
   );
 }
+
+exports.deleteReportAfterSent = (
+  filePath,
+  delayMinutes = 1
+) => {
+  return setTimeout(() => {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }, delayMinutes * 1000 * 60);
+};
