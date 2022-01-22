@@ -145,19 +145,13 @@ O usuário tem 30 minutos para confirmar a conta, ou outro email precisará ser 
 
 ### Configuração e uso
 
-Após clonar o repositório e instalar as dependências:
-
-```
-git clone https://github.com/gabrielkf/businessApi.git
-cd businessApi
-yarn install
-```
-
 Certique-se que as portas 3030 e 27017 do localhost estejam disponíveis.
 
 Os passos para executar a aplicação:
 
-1. Criar arquivo de configurações .env na raiz do projeto
+1. Clonar o repositório na pasta desejada
+
+2. Criar o arquivo de configurações .env na raiz do projeto
 
 ```
 TOKEN_SECRET={seed de criptografia do jwt}
@@ -169,7 +163,7 @@ EMAIL_USERNAME={username do servidor smtp}
 EMAIL_PASSWORD={senha do servidor smtp}
 ```
 
-2. Na pasta do projeto e com o arquivo .env configurado, executar
+3. Na pasta do projeto e com o arquivo .env configurado, executar
 
 ```
 docker-compose up -d
